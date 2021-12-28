@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Chess.Base.Pieces;
 
-namespace Chess.BaseChess
+namespace Chess.Base
 {
     public class Board
     {

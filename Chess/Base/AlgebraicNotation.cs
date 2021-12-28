@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Chess.BaseChess
+namespace Chess.Base
 {
     public struct AlgebraicNotation
     {

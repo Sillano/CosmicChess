@@ -14,11 +14,14 @@ namespace Chess
 
             var isOK = chessboard.TryGetPiece(new("c3"), out Piece piece);
 
-            var xd = piece.GetMoves();
-
-            foreach (var x in xd)
+            if (isOK)
             {
-                Console.WriteLine(x);
+                var xd = piece.GetMoves();
+
+                foreach (var x in xd)
+                {
+                    Console.WriteLine(x);
+                }
             }
         }
     }

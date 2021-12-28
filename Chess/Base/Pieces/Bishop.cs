@@ -1,4 +1,4 @@
-﻿namespace Chess.BaseChess
+﻿namespace Chess.Base.Pieces
 {
     public class Bishop : Piece
     {
