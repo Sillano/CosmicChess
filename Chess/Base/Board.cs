@@ -18,14 +18,14 @@ namespace Chess.Base
             this.pieces[6] = new Knight("g1", this, true);
             this.pieces[7] = new Rook("h1", this, true);
 
-            this.pieces[8] = new WhitePawn("a2", this);
-            this.pieces[9] = new WhitePawn("b2", this);
-            this.pieces[10] = new WhitePawn("c2", this);
-            this.pieces[11] = new WhitePawn("d2", this);
-            this.pieces[12] = new WhitePawn("e2", this);
-            this.pieces[13] = new WhitePawn("f2", this);
-            this.pieces[14] = new WhitePawn("g2", this);
-            this.pieces[15] = new WhitePawn("h2", this);
+            this.pieces[8] = new Pawn("a2", this, true);
+            this.pieces[9] = new Pawn("b2", this, true);
+            this.pieces[10] = new Pawn("c2", this, true);
+            this.pieces[11] = new Pawn("d2", this, true);
+            this.pieces[12] = new Pawn("e2", this, true);
+            this.pieces[13] = new Pawn("f2", this, true);
+            this.pieces[14] = new Pawn("g2", this, true);
+            this.pieces[15] = new Pawn("h2", this, true);
 
             //Black
             this.pieces[16] = new Rook("a8", this, false);
@@ -37,15 +37,15 @@ namespace Chess.Base
             this.pieces[22] = new Knight("g8", this, false);
             this.pieces[23] = new Rook("h8", this, false);
 
-            this.pieces[24] = new BlackPawn("a7", this);
-            this.pieces[25] = new BlackPawn("b7", this);
-            this.pieces[26] = new BlackPawn("c7", this);
-            this.pieces[27] = new BlackPawn("d7", this);
-            this.pieces[28] = new BlackPawn("e7", this);
-            this.pieces[29] = new BlackPawn("f7", this);
-            this.pieces[30] = new BlackPawn("g7", this);
-            this.pieces[31] = new BlackPawn("h7", this);
-        }
+            this.pieces[24] = new Pawn("a7", this, false);
+            this.pieces[25] = new Pawn("b7", this, false);
+            this.pieces[26] = new Pawn("c7", this, false);
+            this.pieces[27] = new Pawn("d7", this, false);
+            this.pieces[28] = new Pawn("e7", this, false);
+            this.pieces[29] = new Pawn("f7", this, false);
+            this.pieces[30] = new Pawn("g7", this, false);
+            this.pieces[31] = new Pawn("h7", this, false);
+        }                                       
 
         public bool TryGetPiece(AlgebraicNotation position, out Piece piece)
         {

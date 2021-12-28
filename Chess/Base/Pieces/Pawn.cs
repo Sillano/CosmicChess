@@ -1,11 +1,12 @@
 ﻿namespace Chess.Base.Pieces
 {
-    public abstract class Pawn : Piece
+    public class Pawn : Piece
     {
-        protected Pawn(AlgebraicNotation position, Board chessboard, bool isWhite) : base(position, chessboard, isWhite)
+        public Pawn(AlgebraicNotation position, Board chessboard, bool isWhite) : base(position, chessboard, isWhite)
         {
             this.MovesFunctions += NormalMove;
-            this.MovesFunctions += DoubleMove;
+
+            this.CaptureFunctions += NormalCapture;
         }
 
         public bool MovedDobule { get; set; }
