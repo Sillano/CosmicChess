@@ -45,7 +45,7 @@ namespace Chess.Base
             this.pieces[29] = new Pawn("f7", this, false);
             this.pieces[30] = new Pawn("g7", this, false);
             this.pieces[31] = new Pawn("h7", this, false);
-        }                                       
+        }
 
         public bool TryGetPiece(AlgebraicNotation position, out Piece piece)
         {
@@ -59,28 +59,83 @@ namespace Chess.Base
             return false;
         }
 
-        public bool IsValidMove(AlgebraicNotation fromPosition, (int, int) toPosition)
+        internal bool IsValidMove((int, int) toPosition, CheckValidationConditions conditions)
         {
-            if (!CheckInsideChessboard(toPosition))
+            if (!CheckInsideChessboard(toPosition) || toPosition == conditions?.TreatPositionAsOccupied)
                 return false;
+
+            // Explanation:
+            // if we force treat as dead or free there no need for "piece-check" because there is no possibility to be 2 pieces on one spot
+            if (toPosition == conditions?.TreatPositionAsFree || (conditions?.TreatPieceOnPositionAsDead is not null && toPosition != conditions.TreatPieceOnPositionAsDead))
+                return true;
 
             return !pieces.Any(x => x.IsAlive && x.Position == toPosition);
         }
 
-        public bool IsValidCapture(AlgebraicNotation fromPosition, (int, int) toPosition, bool isWhite)
+        internal bool IsValidCapture((int,int) capturingPosition, bool isWhite, CheckValidationConditions conditions)
+            => this.IsValidCapture(capturingPosition, isWhite, conditions);   
+
+        internal bool IsValidCapture((int, int) toPosition, (int, int) capturingPosition, bool isWhite, CheckValidationConditions conditions)
         {
-            if (!CheckInsideChessboard(toPosition))
+            // Explanation:
+            // if we force treat as dead or free there no need for "piece-check" because there is no possibility to be 2 pieces on one spot
+            if (!CheckInsideChessboard(toPosition) || (conditions?.TreatPieceOnPositionAsDead is not null && capturingPosition != conditions.TreatPieceOnPositionAsDead))
                 return false;
 
-            return pieces.Any(x => x.Position == toPosition && x.IsWhite != isWhite);
+            return pieces.Any(x => x.IsAlive && x.Position == capturingPosition && x.IsWhite != isWhite);
         }
 
-        public static bool CheckInsideChessboard((int x, int y) pair) => pair.x >= 1 && pair.x <= 8 && pair.y >= 1 && pair.y <= 8;
+        internal bool CalculateIfMoveWillCauseCheck(CheckValidationConditions conditions)
+        {
+            var kingPosition = conditions.IsKing ? conditions.TreatPositionAsOccupied : this.pieces.OfType<King>().First(x => x.IsWhite == conditions.IsWhite).Position;
 
-        public static bool CheckInsideChessboard((char x, int y) pair) => pair.x >= 1 && pair.x <= 8 && pair.y >= 1 && pair.y <= 8;
 
-        public static bool CheckInsideChessboard(int value) => value >= 1 && value <= 8;
+        }
 
-        public static bool CheckInsideChessboard(char value) => value >= 1 && value <= 8;
+        internal static bool CheckInsideChessboard((int x, int y) pair) => pair.x >= 1 && pair.x <= 8 && pair.y >= 1 && pair.y <= 8;
+
+        internal static bool CheckInsideChessboard((char x, int y) pair) => pair.x >= 1 && pair.x <= 8 && pair.y >= 1 && pair.y <= 8;
+
+        internal static bool CheckInsideChessboard(int value) => value >= 1 && value <= 8;
+
+        internal static bool CheckInsideChessboard(char value) => value >= 1 && value <= 8;
+    }
+
+    public class CheckValidationConditions
+    {
+        public CheckValidationConditions(
+            AlgebraicNotation moveFrom,
+            AlgebraicNotation moveTo,
+            bool isWhite,
+            bool isKing = false)
+        {
+            this.TreatPositionAsFree = moveFrom;
+
+            this.TreatPositionAsOccupied = moveTo;
+
+            this.IsKing = isWhite;
+
+            this.IsWhite = isKing;
+        }
+
+        public CheckValidationConditions(
+            AlgebraicNotation moveFrom,
+            AlgebraicNotation moveTo,
+            AlgebraicNotation treatPieceOnPositionAsDead,
+            bool isWhite,
+            bool isKing = false) : this(moveFrom, moveTo, isWhite, isKing)
+        {
+            this.TreatPieceOnPositionAsDead = treatPieceOnPositionAsDead;
+        }
+
+        public bool IsWhite { get; set; }
+
+        public bool IsKing { get; set; }
+
+        public AlgebraicNotation TreatPositionAsOccupied { get; set; }
+
+        public AlgebraicNotation TreatPositionAsFree { get; set; }
+
+        public AlgebraicNotation? TreatPieceOnPositionAsDead { get; set; }
     }
 }

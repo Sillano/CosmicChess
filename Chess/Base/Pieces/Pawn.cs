@@ -17,7 +17,7 @@
 
             var nextMove = basePosition.Apply(0, this.IsWhite ? 1 : -1);
 
-            if (!this.Chessboard.IsValidMove(this.Position, nextMove))
+            if (!this.Chessboard.IsValidMove(nextMove))
                 return Array.Empty<AlgebraicNotation>();
 
             return new [] { (AlgebraicNotation)nextMove };
@@ -32,7 +32,7 @@
 
             var nextMove = basePosition.Apply(0, this.IsWhite ? 2 : -2);
 
-            if (!this.Chessboard.IsValidMove(this.Position, nextMove))
+            if (!this.Chessboard.IsValidMove(nextMove))
                 return Array.Empty<AlgebraicNotation>();
 
             return new[] { (AlgebraicNotation)nextMove };
@@ -46,12 +46,12 @@
 
             var capture = basePosition.Apply(1, this.IsWhite ? 1 : -1);
 
-            if (this.Chessboard.IsValidCapture(this.Position, capture, this.IsWhite))
+            if (this.Chessboard.IsValidCapture(capture, this.IsWhite))
                 captureList.Add(capture);
 
             capture = basePosition.Apply(-1, this.IsWhite ? 1 : -1);
 
-            if (this.Chessboard.IsValidCapture(this.Position, capture, this.IsWhite))
+            if (this.Chessboard.IsValidCapture(capture, this.IsWhite))
                 captureList.Add(capture);
 
             return captureList;

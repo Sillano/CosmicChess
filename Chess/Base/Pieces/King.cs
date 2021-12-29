@@ -1,6 +1,6 @@
 ﻿namespace Chess.Base.Pieces
 {
-    public class King : Piece
+    internal class King : Piece
     {
         private static readonly (int x, int y)[] movesMatrix = { (1, 1), (-1, 1), (1, -1), (-1, -1), (1, 0), (-1, 0), (0, -1), (-0, -1) };
 
@@ -21,7 +21,7 @@
             {
                 var nextMove = basePosition.Apply(move);
 
-                if (this.Chessboard.IsValidMove(this.Position, nextMove))
+                if (this.Chessboard.IsValidMove(nextMove))
                     movesList.Add(nextMove);
             }
 
@@ -38,7 +38,7 @@
             {
                 var capture = basePosition.Apply(move);
 
-                if (this.Chessboard.IsValidCapture(this.Position, capture, this.IsWhite))
+                if (this.Chessboard.IsValidCapture(capture, this.IsWhite))
                     captureList.Add(capture);
             }
 
