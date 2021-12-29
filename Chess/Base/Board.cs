@@ -59,7 +59,7 @@ namespace Chess.Base
             return false;
         }
 
-        public bool IsValidMove(AlgebraicNotation fromPosition, (int, int) toPosition)
+        public bool IsValidMove((int, int) toPosition)
         {
             if (!CheckInsideChessboard(toPosition))
                 return false;
@@ -67,7 +67,7 @@ namespace Chess.Base
             return !pieces.Any(x => x.IsAlive && x.Position == toPosition);
         }
 
-        public bool IsValidCapture(AlgebraicNotation fromPosition, (int, int) toPosition, bool isWhite)
+        public bool IsValidCapture((int, int) toPosition, bool isWhite)
         {
             if (!CheckInsideChessboard(toPosition))
                 return false;
