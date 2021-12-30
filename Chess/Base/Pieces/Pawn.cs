@@ -17,28 +17,28 @@
 
             var nextMove = basePosition.Apply(0, this.IsWhite ? 1 : -1);
 
-            if (!this.Chessboard.IsValidMove(nextMove))
+            if (!this.Chessboard.IsValidMove(nextMove) || this.Chessboard.EvaluateForCheckAfterMove(new CheckValidationConditions(basePosition, nextMove, this.IsWhite)))
                 return Array.Empty<AlgebraicNotation>();
 
-            return new [] { (AlgebraicNotation)nextMove };
+            return new[] { (AlgebraicNotation)nextMove };
         }
 
         private IEnumerable<AlgebraicNotation> DoubleMove()
         {
-            if(this.MovedSinceStart)
+            if (this.MovedSinceStart)
                 return Array.Empty<AlgebraicNotation>();
 
             (int x, int y) basePosition = this.Position;
 
             var nextMove = basePosition.Apply(0, this.IsWhite ? 2 : -2);
 
-            if (!this.Chessboard.IsValidMove(nextMove))
+            if (!this.Chessboard.IsValidMove(nextMove) || this.Chessboard.EvaluateForCheckAfterMove(new CheckValidationConditions(basePosition, nextMove, this.IsWhite)))
                 return Array.Empty<AlgebraicNotation>();
 
             return new[] { (AlgebraicNotation)nextMove };
         }
 
-        private IEnumerable<AlgebraicNotation> NormalCapture()
+        private IEnumerable<AlgebraicNotation> NormalCapture(CheckValidationConditions? conditions)
         {
             var captureList = new List<AlgebraicNotation>();
 
@@ -46,13 +46,13 @@
 
             var capture = basePosition.Apply(1, this.IsWhite ? 1 : -1);
 
-            if (this.Chessboard.IsValidCapture(capture, this.IsWhite))
-                captureList.Add(capture);
+            if (this.Chessboard.IsValidCapture(capture, this.IsWhite, conditions) && (conditions is not null || !this.Chessboard.EvaluateForCheckAfterMove(new CheckValidationConditions(basePosition, capture, capture, this.IsWhite))))
+                    captureList.Add(capture);
 
             capture = basePosition.Apply(-1, this.IsWhite ? 1 : -1);
 
-            if (this.Chessboard.IsValidCapture(capture, this.IsWhite))
-                captureList.Add(capture);
+            if (this.Chessboard.IsValidCapture(capture, this.IsWhite, conditions) && (conditions is not null || !this.Chessboard.EvaluateForCheckAfterMove(new CheckValidationConditions(basePosition, capture, capture, this.IsWhite))))
+                    captureList.Add(capture);
 
             return captureList;
         }

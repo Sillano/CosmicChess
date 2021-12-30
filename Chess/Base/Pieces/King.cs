@@ -21,14 +21,14 @@
             {
                 var nextMove = basePosition.Apply(move);
 
-                if (this.Chessboard.IsValidMove(nextMove))
+                if (this.Chessboard.IsValidMove(nextMove) && !this.Chessboard.EvaluateForCheckAfterMove(new CheckValidationConditions(basePosition, nextMove, this.IsWhite, true)))
                     movesList.Add(nextMove);
             }
 
             return movesList;
         }
 
-        private IEnumerable<AlgebraicNotation> Capture()
+        private IEnumerable<AlgebraicNotation> Capture(CheckValidationConditions conditions)
         {
             var captureList = new List<AlgebraicNotation>();
 
@@ -38,7 +38,7 @@
             {
                 var capture = basePosition.Apply(move);
 
-                if (this.Chessboard.IsValidCapture(capture, this.IsWhite))
+                if (this.Chessboard.IsValidCapture(capture, this.IsWhite, conditions) && (conditions is not null || !this.Chessboard.EvaluateForCheckAfterMove(new CheckValidationConditions(basePosition, capture, capture, this.IsWhite, true))))
                     captureList.Add(capture);
             }
 

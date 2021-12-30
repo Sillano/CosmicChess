@@ -9,11 +9,11 @@ namespace Chess.Base
         public Board()
         {
             //White
-            this.pieces[0] = new Rook("a1", this, true);
+            this.pieces[0] = new Rook("e5", this, true);
             this.pieces[1] = new Knight("b1", this, true);
             this.pieces[2] = new Bishop("c1", this, true);
             this.pieces[3] = new Queen("d1", this, true);
-            this.pieces[4] = new King("e1", this, true);
+            this.pieces[4] = new King("f5", this, true);
             this.pieces[5] = new Bishop("f1", this, true);
             this.pieces[6] = new Knight("g1", this, true);
             this.pieces[7] = new Rook("h1", this, true);
@@ -31,7 +31,7 @@ namespace Chess.Base
             this.pieces[16] = new Rook("a8", this, false);
             this.pieces[17] = new Knight("b8", this, false);
             this.pieces[18] = new Bishop("c8", this, false);
-            this.pieces[19] = new Queen("d8", this, false);
+            this.pieces[19] = new Queen("b5", this, false);
             this.pieces[20] = new King("e8", this, false);
             this.pieces[21] = new Bishop("f8", this, false);
             this.pieces[22] = new Knight("g8", this, false);
@@ -59,37 +59,39 @@ namespace Chess.Base
             return false;
         }
 
-        internal bool IsValidMove((int, int) toPosition, CheckValidationConditions conditions)
+        internal bool IsValidMove((int, int) toPosition, CheckValidationConditions? conditions = null)
         {
             if (!CheckInsideChessboard(toPosition) || toPosition == conditions?.TreatPositionAsOccupied)
                 return false;
 
             // Explanation:
             // if we force treat as dead or free there no need for "piece-check" because there is no possibility to be 2 pieces on one spot
-            if (toPosition == conditions?.TreatPositionAsFree || (conditions?.TreatPieceOnPositionAsDead is not null && toPosition != conditions.TreatPieceOnPositionAsDead))
+            if (toPosition == conditions?.TreatPositionAsFree)
                 return true;
 
-            return !pieces.Any(x => x.IsAlive && x.Position == toPosition);
+            return !pieces.Any(x => x.IsAlive && x.Position == toPosition && (x.Position != conditions?.TreatPieceOnPositionAsDead));
         }
 
-        internal bool IsValidCapture((int,int) capturingPosition, bool isWhite, CheckValidationConditions conditions)
-            => this.IsValidCapture(capturingPosition, isWhite, conditions);   
+        internal bool IsValidCapture((int,int) capturingPosition, bool isWhite, CheckValidationConditions? conditions)
+            => this.IsValidCapture(capturingPosition, capturingPosition, isWhite, conditions);   
 
-        internal bool IsValidCapture((int, int) toPosition, (int, int) capturingPosition, bool isWhite, CheckValidationConditions conditions)
+        internal bool IsValidCapture((int, int) toPosition, (int, int) capturingPosition, bool isWhite, CheckValidationConditions? conditions)
         {
             // Explanation:
             // if we force treat as dead or free there no need for "piece-check" because there is no possibility to be 2 pieces on one spot
-            if (!CheckInsideChessboard(toPosition) || (conditions?.TreatPieceOnPositionAsDead is not null && capturingPosition != conditions.TreatPieceOnPositionAsDead))
+            if (!CheckInsideChessboard(toPosition))
                 return false;
 
-            return pieces.Any(x => x.IsAlive && x.Position == capturingPosition && x.IsWhite != isWhite);
+            return pieces.Any(x => x.IsAlive && x.Position == capturingPosition && (x.Position != conditions?.TreatPieceOnPositionAsDead) && x.IsWhite != isWhite);
         }
 
-        internal bool CalculateIfMoveWillCauseCheck(CheckValidationConditions conditions)
+        internal bool EvaluateForCheckAfterMove(CheckValidationConditions conditions)
         {
             var kingPosition = conditions.IsKing ? conditions.TreatPositionAsOccupied : this.pieces.OfType<King>().First(x => x.IsWhite == conditions.IsWhite).Position;
 
+            var possibleOpponentCaptures = this.pieces.Where(x => x.IsWhite != conditions.IsWhite && x.IsAlive && (x.Position != conditions?.TreatPieceOnPositionAsDead)).SelectMany(x => x.GetCaptures(conditions));
 
+            return possibleOpponentCaptures.Any(x => x == kingPosition);
         }
 
         internal static bool CheckInsideChessboard((int x, int y) pair) => pair.x >= 1 && pair.x <= 8 && pair.y >= 1 && pair.y <= 8;
@@ -113,9 +115,9 @@ namespace Chess.Base
 
             this.TreatPositionAsOccupied = moveTo;
 
-            this.IsKing = isWhite;
+            this.IsKing = isKing;
 
-            this.IsWhite = isKing;
+            this.IsWhite = isWhite;
         }
 
         public CheckValidationConditions(

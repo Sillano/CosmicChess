@@ -11,7 +11,7 @@
 
         internal Func<IEnumerable<AlgebraicNotation>> MovesFunctions { get; set; } = () => Array.Empty<AlgebraicNotation>();
 
-        internal Func<CheckValidationConditions, IEnumerable<AlgebraicNotation>> CaptureFunctions { get; set; } = _ => Array.Empty<AlgebraicNotation>();
+        internal Func<CheckValidationConditions?, IEnumerable<AlgebraicNotation>> CaptureFunctions { get; set; } = _ => Array.Empty<AlgebraicNotation>();
 
         protected Board Chessboard { get; set; }
 
@@ -31,7 +31,7 @@
 
         internal AlgebraicNotation[] GetCaptures(CheckValidationConditions? conditions = null) => this.CaptureFunctions
             .GetInvocationList()
-            .Cast<Func<CheckValidationConditions, IEnumerable<AlgebraicNotation>>>()
+            .Cast<Func<CheckValidationConditions?, IEnumerable<AlgebraicNotation>>>()
             .SelectMany(x => x(conditions))
             .ToArray();
 
@@ -51,21 +51,21 @@
 
         protected IEnumerable<AlgebraicNotation> ExploreNegativeXNegativeYAxisForMoves() => ExploreAxisForMoves(i => (-i, -i));
 
-        protected IEnumerable<AlgebraicNotation> ExplorePositiveXAxisForCapture(CheckValidationConditions conditions) => ExploreAxisForCapture(conditions, i => (i, 0));
+        protected IEnumerable<AlgebraicNotation> ExplorePositiveXAxisForCapture(CheckValidationConditions? conditions) => ExploreAxisForCapture(conditions, i => (i, 0));
 
-        protected IEnumerable<AlgebraicNotation> ExploreNegativeXAxisForCapture(CheckValidationConditions conditions) => ExploreAxisForCapture(conditions, i => (-i, 0));
+        protected IEnumerable<AlgebraicNotation> ExploreNegativeXAxisForCapture(CheckValidationConditions? conditions) => ExploreAxisForCapture(conditions, i => (-i, 0));
 
-        protected IEnumerable<AlgebraicNotation> ExplorePositiveYAxisForCapture(CheckValidationConditions conditions) => ExploreAxisForCapture(conditions, i => (0, i));
+        protected IEnumerable<AlgebraicNotation> ExplorePositiveYAxisForCapture(CheckValidationConditions? conditions) => ExploreAxisForCapture(conditions, i => (0, i));
 
-        protected IEnumerable<AlgebraicNotation> ExploreNegativeYAxisForCapture(CheckValidationConditions conditions) => ExploreAxisForCapture(conditions, i => (0, -i));
+        protected IEnumerable<AlgebraicNotation> ExploreNegativeYAxisForCapture(CheckValidationConditions? conditions) => ExploreAxisForCapture(conditions, i => (0, -i));
 
-        protected IEnumerable<AlgebraicNotation> ExplorePositiveXPositiveYAxisForCapture(CheckValidationConditions conditions) => ExploreAxisForCapture(conditions, i => (i, i));
+        protected IEnumerable<AlgebraicNotation> ExplorePositiveXPositiveYAxisForCapture(CheckValidationConditions? conditions) => ExploreAxisForCapture(conditions, i => (i, i));
 
-        protected IEnumerable<AlgebraicNotation> ExplorePositiveXNegativeYAxisForCapture(CheckValidationConditions conditions) => ExploreAxisForCapture(conditions, i => (i, -i));
+        protected IEnumerable<AlgebraicNotation> ExplorePositiveXNegativeYAxisForCapture(CheckValidationConditions? conditions) => ExploreAxisForCapture(conditions, i => (i, -i));
 
-        protected IEnumerable<AlgebraicNotation> ExploreNegativeXPositiveYAxisForCapture(CheckValidationConditions conditions) => ExploreAxisForCapture(conditions, i => (-i, i));
+        protected IEnumerable<AlgebraicNotation> ExploreNegativeXPositiveYAxisForCapture(CheckValidationConditions? conditions) => ExploreAxisForCapture(conditions, i => (-i, i));
 
-        protected IEnumerable<AlgebraicNotation> ExploreNegativeXNegativeYAxisForCapture(CheckValidationConditions conditions) => ExploreAxisForCapture(conditions, i => (-i, -i));
+        protected IEnumerable<AlgebraicNotation> ExploreNegativeXNegativeYAxisForCapture(CheckValidationConditions? conditions) => ExploreAxisForCapture(conditions, i => (-i, -i));
 
         private IEnumerable<AlgebraicNotation> ExploreAxisForMoves(Func<int, (int, int)> func)
         {
@@ -77,7 +77,7 @@
             {
                 var nextMove = basePosition.Apply(func(i));
 
-                if (!this.Chessboard.IsValidMove(nextMove))
+                if (!this.Chessboard.IsValidMove(nextMove) || this.Chessboard.EvaluateForCheckAfterMove(new CheckValidationConditions(basePosition, nextMove, this.IsWhite)))
                     break;
 
                 movesList.Add(nextMove);
@@ -86,7 +86,7 @@
             return movesList;
         }
 
-        private IEnumerable<AlgebraicNotation> ExploreAxisForCapture(CheckValidationConditions conditions, Func<int, (int, int)> func)
+        private IEnumerable<AlgebraicNotation> ExploreAxisForCapture(CheckValidationConditions? conditions, Func<int, (int, int)> func)
         {
             var captureList = new List<AlgebraicNotation>();
 
@@ -99,7 +99,7 @@
                 if (this.Chessboard.IsValidMove(capture, conditions))
                     continue;
 
-                if (this.Chessboard.IsValidCapture(capture, this.IsWhite, conditions))
+                if (this.Chessboard.IsValidCapture(capture, this.IsWhite, conditions) && (conditions is not null || !this.Chessboard.EvaluateForCheckAfterMove(new CheckValidationConditions(basePosition, capture, capture, this.IsWhite))))
                     captureList.Add(capture);
 
                 break;

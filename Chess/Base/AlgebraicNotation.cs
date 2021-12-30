@@ -8,9 +8,9 @@ namespace Chess.Base
 
         private int x = 1;
 
-        private int Y { get => this.y; set => this.y = Board.CheckInsideChessboard(value) ? value : throw new ArgumentOutOfRangeException(nameof(this.Y)); }
+        public int Y { get => this.y; private set => this.y = Board.CheckInsideChessboard(value) ? value : throw new ArgumentOutOfRangeException(nameof(this.Y)); }
 
-        private int X { get => this.x; set => this.x = Board.CheckInsideChessboard(value) ? value : throw new ArgumentOutOfRangeException(nameof(this.X)); }
+        public int X { get => this.x; private set => this.x = Board.CheckInsideChessboard(value) ? value : throw new ArgumentOutOfRangeException(nameof(this.X)); }
 
         public AlgebraicNotation(int x, int y)
         {
